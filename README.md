@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-# Grocery-List-Manager-ui
-=======
+
 # 🛒 Grocery List Manager
 
 A full-stack MERN application for managing shared grocery lists with real-time synchronization. Built with React, Express, MongoDB, and Server-Sent Events.
