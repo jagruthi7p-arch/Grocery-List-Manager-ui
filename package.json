@@ -1,0 +1,31 @@
+{
+  "name": "grocery-list-manager",
+  "version": "1.0.0",
+  "description": "Grocery List Manager — three-tier MERN. client/ (React + Vite + Tailwind), server/ (Express + Mongoose + SSE + JWT), MongoDB Atlas.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "build": "vite build --config client/vite.config.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.5.0",
+    "axios": "^1.15.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.4.0",
+    "postcss": "^8.5.12",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^3.4.19",
+    "vite": "^8.0.10"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "overrides": {
+    "object-inspect": "^1.13.4"
+  }
+}

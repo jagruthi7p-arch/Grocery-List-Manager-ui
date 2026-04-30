@@ -1,0 +1,172 @@
+{
+  "title": "Grocery List Manager — Project Architecture",
+  "stack": {
+    "frontend": ["React 18", "Vite (build tool)", "TailwindCSS (PostCSS)", "Axios"],
+    "backend":  ["Node.js", "Express.js", "JWT (jsonwebtoken)", "bcrypt"],
+    "database": ["MongoDB Atlas", "Mongoose ODM"],
+    "realtime": ["Server-Sent Events (SSE)"],
+    "tools":    ["Git", "GitHub", "Postman", "npm", "Vite"]
+  },
+  "tree": [
+    { "type": "folder", "name": "client", "desc": "Frontend layer — React app built by Vite, served from /dist",
+      "children": [
+        { "type": "file",   "name": "index.html",         "desc": "Vite entry HTML — loads /src/main.jsx" },
+        { "type": "file",   "name": "vite.config.js",     "desc": "Vite build/dev config (React plugin, /api proxy)" },
+        { "type": "file",   "name": "tailwind.config.js", "desc": "Tailwind theme — cream/forest/terra palette + animations" },
+        { "type": "file",   "name": "postcss.config.js",  "desc": "PostCSS pipeline — Tailwind + Autoprefixer" },
+        { "type": "folder", "name": "src", "desc": "React source",
+          "children": [
+            { "type": "file", "name": "main.jsx",  "desc": "Mount point — renders <Root/> into #root" },
+            { "type": "file", "name": "App.jsx",   "desc": "All UI screens: Landing, Auth, Groups, Lists, Items, Settings, Admin, Architecture" },
+            { "type": "file", "name": "index.css", "desc": "Tailwind directives + custom CSS (mesh, grain, scrollbars)" }
+          ]
+        },
+        { "type": "folder", "name": "dist", "desc": "Vite build output — what Express serves in production" }
+      ]
+    },
+    { "type": "folder", "name": "server", "desc": "Backend layer — Express app, split into config / models / middleware / utils / routes",
+      "children": [
+        { "type": "file", "name": "server.js", "desc": "Entry point — wires layers and mounts API routes" },
+        { "type": "file", "name": "architecture.json", "desc": "Powers the in-app Architecture page (this data)" },
+        { "type": "folder", "name": "config", "desc": "Configuration & connections",
+          "children": [
+            { "type": "file", "name": "db.js", "desc": "MongoDB connection (Mongoose)" }
+          ]
+        },
+        { "type": "folder", "name": "models", "desc": "Mongoose schemas — one per database collection (spec §11)",
+          "children": [
+            { "type": "file", "name": "User.js",  "desc": "Users — name, email, password" },
+            { "type": "file", "name": "Group.js", "desc": "Groups — groupName, members, inviteCode, createdBy" },
+            { "type": "file", "name": "List.js",  "desc": "Lists — groupId, name, completedAt, createdBy" },
+            { "type": "file", "name": "Item.js",  "desc": "Items — listId, name, category, quantity, isPurchased" }
+          ]
+        },
+        { "type": "folder", "name": "middleware", "desc": "Express middlewares",
+          "children": [
+            { "type": "file", "name": "auth.js",      "desc": "JWT — signToken() + requireAuth() (Bearer token check)" },
+            { "type": "file", "name": "adminAuth.js", "desc": "X-Admin-Password header check" }
+          ]
+        },
+        { "type": "folder", "name": "utils", "desc": "Reusable helpers",
+          "children": [
+            { "type": "file", "name": "sse.js",            "desc": "Real-time Server-Sent Events handler & broadcast()" },
+            { "type": "file", "name": "inviteCode.js",     "desc": "Generates unique 6-char group invite codes" },
+            { "type": "file", "name": "listCompletion.js", "desc": "Auto-marks a list complete when all items are purchased" }
+          ]
+        },
+        { "type": "folder", "name": "routes", "desc": "REST API endpoints (mounted under /api/*)",
+          "children": [
+            { "type": "file", "name": "users.js",  "desc": "Register, login, profile, change password" },
+            { "type": "file", "name": "groups.js", "desc": "Create / list / join groups via invite code" },
+            { "type": "file", "name": "lists.js",  "desc": "CRUD shopping lists" },
+            { "type": "file", "name": "items.js",  "desc": "CRUD grocery items + real-time broadcast" },
+            { "type": "file", "name": "admin.js",  "desc": "Admin login + management endpoints" }
+          ]
+        }
+      ]
+    },
+    { "type": "folder", "name": "offline", "desc": "Self-contained copy of the same project that runs on a laptop",
+      "children": [
+        { "type": "file", "name": "server.js", "desc": "Same Express app (single file for portability)" },
+        { "type": "file", "name": "index.html", "desc": "Same React UI" },
+        { "type": "file", "name": "package.json", "desc": "Same npm dependencies" },
+        { "type": "file", "name": "README.md", "desc": "Local-run instructions" }
+      ]
+    },
+    { "type": "file", "name": "package.json", "desc": "npm dependencies & scripts (start = node server/server.js)" },
+    { "type": "file", "name": "README.md",    "desc": "Project overview and run instructions" },
+    { "type": "file", "name": "replit.md",    "desc": "Internal notes about the codebase" }
+  ],
+  "collections": [
+    { "name": "Users",  "fields": [
+      { "name": "_id",      "type": "ObjectId" },
+      { "name": "name",     "type": "String" },
+      { "name": "email",    "type": "String (unique)" },
+      { "name": "password", "type": "String" }
+    ]},
+    { "name": "Groups", "fields": [
+      { "name": "_id",        "type": "ObjectId" },
+      { "name": "groupName",  "type": "String" },
+      { "name": "inviteCode", "type": "String (unique, 6 chars)" },
+      { "name": "createdBy",  "type": "ref → Users" },
+      { "name": "members",    "type": "[ref → Users]" },
+      { "name": "createdAt",  "type": "Date" }
+    ]},
+    { "name": "Lists",  "fields": [
+      { "name": "_id",         "type": "ObjectId" },
+      { "name": "groupId",     "type": "ref → Groups" },
+      { "name": "name",        "type": "String" },
+      { "name": "createdBy",   "type": "ref → Users" },
+      { "name": "createdAt",   "type": "Date" },
+      { "name": "completedAt", "type": "Date | null" }
+    ]},
+    { "name": "Items",  "fields": [
+      { "name": "_id",         "type": "ObjectId" },
+      { "name": "listId",      "type": "ref → Lists" },
+      { "name": "name",        "type": "String" },
+      { "name": "category",    "type": "String (one of 9)" },
+      { "name": "quantity",    "type": "String" },
+      { "name": "isPurchased", "type": "Boolean" },
+      { "name": "updatedAt",   "type": "Date" }
+    ]}
+  ],
+  "endpoints": [
+    { "group": "Users",  "items": [
+      { "method": "POST",   "path": "/api/users/register",        "desc": "Create a new account → returns { token, user }" },
+      { "method": "POST",   "path": "/api/users/login",           "desc": "Sign in → returns { token, user }" },
+      { "method": "GET",    "path": "/api/users/me",              "desc": "Current user (JWT required)" },
+      { "method": "GET",    "path": "/api/users",                 "desc": "List all users (JWT required)" },
+      { "method": "PUT",    "path": "/api/users/:id",             "desc": "Update own profile (JWT required, self only)" },
+      { "method": "PUT",    "path": "/api/users/:id/password",    "desc": "Change own password (JWT required, self only)" }
+    ]},
+    { "group": "Groups", "items": [
+      { "method": "POST",   "path": "/api/groups",                "desc": "Create a household group" },
+      { "method": "GET",    "path": "/api/groups/user/:userId",   "desc": "List groups for a user" },
+      { "method": "POST",   "path": "/api/groups/:codeOrId/join", "desc": "Join via invite code or id" }
+    ]},
+    { "group": "Lists",  "items": [
+      { "method": "POST",   "path": "/api/lists",                 "desc": "Create list" },
+      { "method": "GET",    "path": "/api/lists/group/:groupId",  "desc": "Lists in a group" },
+      { "method": "PUT",    "path": "/api/lists/:listId",         "desc": "Rename / mark complete" },
+      { "method": "DELETE", "path": "/api/lists/:listId",         "desc": "Delete (and items)" }
+    ]},
+    { "group": "Items",  "items": [
+      { "method": "GET",    "path": "/api/items/list/:listId",    "desc": "Items in a list" },
+      { "method": "POST",   "path": "/api/items",                 "desc": "Add an item (broadcasts)" },
+      { "method": "PUT",    "path": "/api/items/:id",             "desc": "Update / mark purchased (broadcasts)" },
+      { "method": "DELETE", "path": "/api/items/:id",             "desc": "Delete (broadcasts)" }
+    ]},
+    { "group": "Admin",  "items": [
+      { "method": "POST",   "path": "/api/admin/login",           "desc": "Admin password gate" },
+      { "method": "GET",    "path": "/api/admin/stats",           "desc": "Counts across all collections" },
+      { "method": "GET",    "path": "/api/admin/users",           "desc": "All users + group counts" },
+      { "method": "GET",    "path": "/api/admin/groups",          "desc": "All groups + list counts" },
+      { "method": "GET",    "path": "/api/admin/lists",           "desc": "All lists + item progress" },
+      { "method": "DELETE", "path": "/api/admin/users/:id",       "desc": "Delete user (cascades)" },
+      { "method": "DELETE", "path": "/api/admin/groups/:id",      "desc": "Delete group (cascades)" },
+      { "method": "DELETE", "path": "/api/admin/lists/:id",       "desc": "Delete list (cascades)" }
+    ]},
+    { "group": "Realtime", "items": [
+      { "method": "GET", "path": "/api/events", "desc": "Server-Sent Events stream (item:* and list:* events)" }
+    ]}
+  ],
+  "features": [
+    { "title": "Collaborative shared lists",  "done": true,  "ref": "spec §12 Collaborative Lists" },
+    { "title": "Multi-user group access",     "done": true,  "ref": "spec §12 Privacy" },
+    { "title": "Add / edit / delete items",   "done": true,  "ref": "spec §12 Item Management" },
+    { "title": "9 categories",                "done": true,  "ref": "spec §12 Categorization" },
+    { "title": "Mark items as purchased",     "done": true,  "ref": "spec §12 Purchase Tracking" },
+    { "title": "Real-time sync (SSE)",        "done": true,  "ref": "spec §12 Real-time Sync" },
+    { "title": "Group-based privacy",         "done": true,  "ref": "spec §12 Privacy" },
+    { "title": "Account password change",     "done": true,  "ref": "extra — Settings" },
+    { "title": "JWT token authentication",    "done": true,  "ref": "extra — security" },
+    { "title": "Vite + React build pipeline", "done": true,  "ref": "extra — build" },
+    { "title": "Admin panel",                 "done": true,  "ref": "extra" },
+    { "title": "Push notifications",          "done": false, "ref": "spec §13 Optional" },
+    { "title": "Voice-based item addition",   "done": false, "ref": "spec §13 Optional" },
+    { "title": "AI smart suggestions",        "done": false, "ref": "spec §13 Optional" },
+    { "title": "Offline support with sync",   "done": false, "ref": "spec §13 Optional" },
+    { "title": "Barcode scanner",             "done": false, "ref": "spec §13 Optional" },
+    { "title": "Budget tracking",             "done": false, "ref": "spec §13 Optional" }
+  ]
+}

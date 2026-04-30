@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { font-family: 'Outfit', system-ui, sans-serif; background: #F7F3EC; color: #1A1A1A; }
+* { -webkit-font-smoothing: antialiased; }
+
+.pantry-check { appearance: none; width: 22px; height: 22px; border: 1.5px solid #C8BFA8; border-radius: 7px; background: #FBF8F2; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .2s ease; flex-shrink: 0; }
+.pantry-check:hover { border-color: #1F3D2C; }
+.pantry-check:checked { background: #1F3D2C; border-color: #1F3D2C; }
+.pantry-check:checked::after { content: ''; width: 6px; height: 11px; border: solid #F7F3EC; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E8E2D5; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #C8BFA8; }
+
+.field { width: 100%; background: #FBF8F2; border: 1.5px solid #E8E2D5; border-radius: 14px; padding: 14px 16px; font-size: 15px; transition: all .2s ease; outline: none; font-family: inherit; }
+.field:focus { border-color: #1F3D2C; background: #fff; }
+.field::placeholder { color: #A6A29A; }
+
+.mesh { background: radial-gradient(at 20% 10%, rgba(244,213,141,0.35) 0px, transparent 45%), radial-gradient(at 85% 15%, rgba(217,119,87,0.18) 0px, transparent 50%), radial-gradient(at 75% 85%, rgba(123,155,122,0.25) 0px, transparent 55%), radial-gradient(at 10% 90%, rgba(31,61,44,0.10) 0px, transparent 50%), #F7F3EC; }
+.skeleton { background: linear-gradient(90deg, #EFE9DC 0%, #F7F3EC 50%, #EFE9DC 100%); background-size: 1000px 100%; animation: shimmer 2s linear infinite; }
+.grain::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.4; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E"); }
